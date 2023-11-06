@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image and Response</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Bangers&display=swap");
+
+      body {
+        overflow-y: scroll;
+        overflow-x: hidden;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        background-color: black;
+        background-size: cover;
+        background-position: center;
+      }
+
+      #container {
+        z-index: 10;
+        text-align: center;
+        justify-content: center;
+        padding: 20px;
+        border: 1px solid black;
+        border-radius: 10px;
+        background-color: #c8453b;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 400px;
+      }
+
+      h1 {
+        font-family: "Bangers", cursive;
+        letter-spacing: 0.3rem;
+        font-size: 50px;
+        margin-bottom: 60px;
+        color: black;
+      }
+
+      button {
+        position: relative;
+        left: 30px;
+        padding: 10px 20px;
+        background-color: #c8453b;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: black;
+      }
+
+      #response {
+        overflow-x: scroll;
+        margin-top: 20px;
+        text-align: left;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #e4decf;
+      }
+
+      .response {
+        position: relative;
+        text-align: center;
+        height: max-content;
+        margin-top: 20px;
+        text-align: left;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        background-color: #e4decf;
+        margin-bottom: 50px;
+      }
+
+      #response p {
+        margin: 0;
+      }
+
+      .description {
+        font-family: "Bangers", cursive;
+        letter-spacing: 0.2rem;
+        font-size: 30px;
+        font-weight: bold;
+      }
+
+      #image-container {
+        z-index: 100;
+        margin-bottom: 3rem;
+      }
+
+      #image-container img {
+        width: 30%;
+      }
+    </style>
+  </head>
+  <body id="body">
+    <div class="content">
+      <div id="container">
+        <h1>Project</h1>
+        <div class="response">
+          <input type="file" id="fileInput" onchange="setBodyBackground()" />
+          <button onclick="uploadImage()">Upload</button>
+        </div>
+        <div id="image-container"></div>
+        <div>
+          <div class="description">Description</div>
+          <div id="response">Response will be displayed here.</div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function setBodyBackground() {
+        const fileInput = document.getElementById("fileInput");
+        const imageContainer = document.getElementById("image-container");
+        const file = fileInput.files[0];
+
+        if (file) {
+          // Set the selected image as the blurred background
+          imageContainer.innerHTML = `<img src="${URL.createObjectURL(
+            file
+          )}" alt="Selected Image">`;
+        }
+      }
+
+      function uploadImage() {
+        const fileInput = document.getElementById("fileInput");
+        const responseDiv = document.getElementById("response");
+        const file = fileInput.files[0];
+        if (file) {
+          const formData = new FormData();
+          formData.append("img", file);
+
+          fetch("/upload/", {
+            method: "POST",
+            body: formData,
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              responseDiv.innerHTML =
+                "<p>API Response:</p><pre>" +
+                JSON.stringify(data, null, 2) +
+                "</pre>";
+            })
+            .catch((error) => {
+              responseDiv.innerHTML = "<p>Error occurred: " + error + "</p>";
+            });
+        } else {
+          responseDiv.innerHTML = "<p>Please select an image to upload.</p>";
+        }
+      }
+    </script>
+  </body>
+</html>
